@@ -1,0 +1,35 @@
+import logging
+from logging import Logger
+import sys
+
+from typing import Dict, Optional
+
+LOG_FORMAT = ""
+LOG_TO_CONSOLE = False
+
+LOG_LEVEL = logging.DEBUG
+
+
+def getLogger(name=None, level=None, isVerbose=False) -> Logger:
+    if level is None:
+        if isVerbose:
+            log_level = logging.DEBUG
+        else:
+            log_level = LOG_LEVEL
+    else:
+        log_level = level
+
+    log_format = logging.Formatter(LOG_FORMAT)
+    log = logging.getLogger(name)
+    log.setLevel(log_level)
+
+    if not log.hasHandlers():
+
+        if LOG_TO_CONSOLE:
+            # writing to stdout
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(log_level)
+            handler.setFormatter(log_format)
+            log.addHandler(handler)
+
+    return log
