@@ -7,7 +7,8 @@ from ...logging import logengine
 
 
 class TCPServer(Thread):
-    def __init__(self, listenAddress="", port=4300, backlog: int = 0, sessionHandler=TCPSessionHandler):
+    def __init__(self, listenAddress="", port=4300, backlog: int = 0, sessionHandler=TCPSessionHandler,
+                 authManager=None):
         super().__init__()
         self.listeningAddress = listenAddress
         self.port = port
@@ -22,6 +23,9 @@ class TCPServer(Thread):
         self.logger = logengine.getLogger()
 
         self.sessionHandlerType = sessionHandler
+
+        self.authManager = authManager
+
 
     def __str__(self):
         return "TCP Server at " + str(self.listeningAddress) + ":" + str(self.port)
@@ -42,7 +46,7 @@ class TCPServer(Thread):
                 self.sock.listen(self.backlog)
                 self.connection, clientAddress = self.sock.accept()
                 address, port = socket.getnameinfo(clientAddress, self.flags)
-                handler = self.sessionHandlerType(self.connection, address, port)
+                handler = self.sessionHandlerType(self, self.connection, address, port, self.authManager)
                 self.sessionHandlers.append(handler)
                 handler.start()
                 self.logger.debug("Received Connection from {}:{}".format(address, port))
@@ -51,3 +55,11 @@ class TCPServer(Thread):
                 sessionHandler.requestClose()
             for sessionHandler in self.sessionHandlers:
                 sessionHandler.join()
+
+    def broadcastMessage(self, message: bytes):
+        for sessionHander in self.sessionHandlers:
+            sessionHander.sendMessage(message)
+
+    def removeSessionHandler(self, sessionHandler):
+        if sessionHandler in self.sessionHandlers:
+            self.sessionHandlers.remove(sessionHandler)

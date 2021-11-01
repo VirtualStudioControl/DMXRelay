@@ -1,12 +1,15 @@
 from threading import Lock, Thread
+from typing import Optional
 
 from ...tools.bytetools import *
 from ...logging import logengine
-
+from ...auth.auth_utils import generateSalt
+from ...protocol.serverprotocol import handleMessage
 
 class TCPSessionHandler(Thread):
-    def __init__(self, connection, address, port):
+    def __init__(self, server, connection, address, port, authManager):
         super().__init__()
+        self.server = server
         self.connection = connection
         self.address = address
         self.port = port
@@ -16,14 +19,19 @@ class TCPSessionHandler(Thread):
         self.logger = logengine.getLogger()
 
         self.shouldClose = True
+        self.authenticated = False
+        self.challenge = generateSalt(64, 128)
+        self.authManager = authManager
+        self.username: Optional[str] = None
 
     def run(self) -> None:
         try:
             self.shouldClose = False
             while not self.shouldClose:
+                self.logger.debug("Ready to wait for messages....")
                 length = self.getMessageLength()
                 data = self.connection.recv(length)
-                self.logger.debug("Message Recieved: {:08X} {} from {}:{:06d}".format(length, str(data),
+                self.logger.debug("Message Recieved: {:08X} {} from {}:{}".format(length, str(data),
                                                                                       str(self.address), self.port))
                 self.onMessageRecv(data)
 
@@ -31,6 +39,7 @@ class TCPSessionHandler(Thread):
             pass  # Ignore
         finally:
             self.connection.close()
+            self.server.removeSessionHandler(self)
 
     def requestClose(self):
         self.shouldClose = True
@@ -43,7 +52,9 @@ class TCPSessionHandler(Thread):
             return getInt(length, start=0)
 
     def onMessageRecv(self, data):
-        pass
+        response = handleMessage(self, data)
+        if response is not None:
+            self.sendMessage(response)
 
     def sendMessage(self, message: bytes):
         if self.connection is not None:

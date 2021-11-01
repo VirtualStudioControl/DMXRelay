@@ -1,7 +1,7 @@
 from typing import Union
 
 
-def putInt(array: Union[bytearray], value: int, start: int = 0, append: bool = False):
+def putInt(array: Union[bytearray], value: int, start: int = 0, append: bool = True):
     if append:
         array.append((value >>  0) & 0xff)
         array.append((value >>  8) & 0xff)
