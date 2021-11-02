@@ -1,6 +1,6 @@
 from typing import List
 
-from sink.auth import auth_utils
+from . import auth_utils
 
 
 class User:

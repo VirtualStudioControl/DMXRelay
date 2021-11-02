@@ -28,11 +28,8 @@ class TCPSessionHandler(Thread):
         try:
             self.shouldClose = False
             while not self.shouldClose:
-                self.logger.debug("Ready to wait for messages....")
                 length = self.getMessageLength()
                 data = self.connection.recv(length)
-                self.logger.debug("Message Recieved: {:08X} {} from {}:{}".format(length, str(data),
-                                                                                      str(self.address), self.port))
                 self.onMessageRecv(data)
 
         except ConnectionResetError:

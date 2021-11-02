@@ -104,7 +104,7 @@ def readFileBinary(path):
 
 
 def writeJSON(path: str, values: dict):
-    content = json.dumps(values)
+    content = json.dumps(values, indent=2, sort_keys=True)
     writeFile(path, content)
 
 

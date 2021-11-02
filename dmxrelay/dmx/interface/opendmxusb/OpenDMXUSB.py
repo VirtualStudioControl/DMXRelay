@@ -1,45 +1,41 @@
 from serial import *
 from typing import Optional, List, Union
 
+from dmxrelay.sink.logging import logengine
 from ..abstract.IDMXDevice import IDMXDevice
 
-class DMX512ProMKII(IDMXDevice):
+logger = logengine.getLogger()
+
+class OpenDMXUSB(IDMXDevice):
 
     def __init__(self):
         self.PORT = ""
-        self.HEADDER: List[int]= [0x7e, 6, 1, 2, 0]
-        self.FOOTER: List[int]= [0xe7]
+        self.HEADDER: List[int] = [0]
+        self.FOOTER: List[int] = []
         self.serialConnection: Optional[Serial] = None
 
-        self.BAUDRATE = 256000
+        self.BAUDRATE = 250000
         self.PARITY = PARITY_NONE
-        self.STOPBITS = STOPBITS_ONE
+        self.STOPBITS = STOPBITS_TWO
 
     def initDevice(self, port):
         self.PORT = port
 
         self.serialConnection = Serial(port=self.PORT, stopbits=self.STOPBITS,
                                        parity=self.PARITY, baudrate=self.BAUDRATE)
+        self.serialConnection.setRTS(0)
 
     def sendDMXFrame(self, data: Union[list, bytearray, bytes]):
         if self.serialConnection is not None:
-            source = bytearray()
-            for i in self.HEADDER:
-                source.append(i)
-            for i in data:
-                val = i
-                if val > 0xff:
-                    val = 0xff
-                elif val < 0:
-                    val = 0
-                source.append(val)
-            for i in self.FOOTER:
-                source.append(i)
+            source = bytearray([0])
+            source += bytearray(data)
             try:
+                self.serialConnection.break_condition = True
+                self.serialConnection.break_condition = False
                 self.serialConnection.write(data=source)
-                self.serialConnection.flush()
-            except SerialTimeoutException:
-                pass
+
+            except SerialTimeoutException as ex:
+                logger.exception(ex)
 
     def closeDevice(self):
         if self.serialConnection is not None:

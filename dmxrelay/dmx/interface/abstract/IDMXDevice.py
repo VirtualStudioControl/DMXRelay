@@ -1,10 +1,18 @@
+from typing import Union
+
 
 class IDMXDevice:
 
-    def initDevice (self, port):
+    def devicename(self) -> str:
         pass
 
-    def sendDMXFrame (self, data : list):
+    def manufacturer(self) -> str:
+        pass
+
+    def initDevice(self, port):
+        pass
+
+    def sendDMXFrame(self, data: Union[list, bytearray, bytes]):
         pass
 
     def closeDevice(self):

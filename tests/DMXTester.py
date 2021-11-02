@@ -1,27 +1,26 @@
 from serial import *
-from typing import Optional, List, Union
+from typing import Optional, List
 
-from ..abstract.IDMXDevice import IDMXDevice
-
-class DMX512ProMKII(IDMXDevice):
+class DMX512ProMKII():
 
     def __init__(self):
         self.PORT = ""
-        self.HEADDER: List[int]= [0x7e, 6, 1, 2, 0]
-        self.FOOTER: List[int]= [0xe7]
+        self.HEADDER: List[int]= [0]
+        self.FOOTER: List[int]= []
         self.serialConnection: Optional[Serial] = None
 
-        self.BAUDRATE = 256000
+        self.BAUDRATE = 250000
         self.PARITY = PARITY_NONE
-        self.STOPBITS = STOPBITS_ONE
+        self.STOPBITS = STOPBITS_TWO
 
     def initDevice(self, port):
         self.PORT = port
 
         self.serialConnection = Serial(port=self.PORT, stopbits=self.STOPBITS,
                                        parity=self.PARITY, baudrate=self.BAUDRATE)
+        self.serialConnection.setRTS(0)
 
-    def sendDMXFrame(self, data: Union[list, bytearray, bytes]):
+    def sendDMXFrame(self, data: list):
         if self.serialConnection is not None:
             source = bytearray()
             for i in self.HEADDER:
@@ -36,6 +35,7 @@ class DMX512ProMKII(IDMXDevice):
             for i in self.FOOTER:
                 source.append(i)
             try:
+                self.serialConnection.send_break(0.005)
                 self.serialConnection.write(data=source)
                 self.serialConnection.flush()
             except SerialTimeoutException:
@@ -44,3 +44,18 @@ class DMX512ProMKII(IDMXDevice):
     def closeDevice(self):
         if self.serialConnection is not None:
             self.serialConnection.close()
+
+if __name__ == "__main__":
+    dmxout = DMX512ProMKII()
+    dmxout.initDevice("/dev/ttyUSB0")
+
+    dmxframe = [0]*512
+    dmxframe[0] = 0xff
+    dmxframe[4] = 0xff
+    dmxframe[8] = 0xff
+
+    try:
+        while True:
+            dmxout.sendDMXFrame(dmxframe)
+    finally:
+        dmxout.closeDevice()
