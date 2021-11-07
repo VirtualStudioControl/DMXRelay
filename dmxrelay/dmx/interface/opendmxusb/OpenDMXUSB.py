@@ -24,6 +24,9 @@ class OpenDMXUSB(IDMXDevice):
         self.serialConnection = Serial(port=self.PORT, stopbits=self.STOPBITS,
                                        parity=self.PARITY, baudrate=self.BAUDRATE)
         self.serialConnection.setRTS(0)
+        self.serialConnection.write_timeout = 0.3
+        self.serialConnection.set_input_flow_control(False)
+        self.serialConnection.set_output_flow_control(False)
 
     def sendDMXFrame(self, data: Union[list, bytearray, bytes]):
         if self.serialConnection is not None:

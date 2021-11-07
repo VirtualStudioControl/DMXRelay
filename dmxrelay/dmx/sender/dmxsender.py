@@ -19,7 +19,7 @@ class DMXSender(Thread):
         self.DMX_UNIVERSES: Dict[int, IDMXDevice] = {}
         self.FRAMEBUFFER = DMXBuffer()
 
-        self.frameTime = 1/20.0
+        self.frameTime = 1/120.0
 
         self.universeLock = Lock()
 
@@ -39,16 +39,30 @@ class DMXSender(Thread):
     def run(self) -> None:
         startTime = time()
         while not self.shouldFinish:
+            loop_start_time = time() - startTime
             with self.universeLock:
+                lock_gotten_time = time() - startTime
                 for universe in self.DMX_UNIVERSES:
+                    frame_start_time = time() - startTime
                     frame = self.FRAMEBUFFER.getNextFrame(universe)
+                    got_frame_time = time() - startTime
                     self.DMX_UNIVERSES[universe].sendDMXFrame(frame)
+                    frame_send_time = time() - startTime
+                lock_release_time = time() - startTime
             sleepTime = (startTime + self.frameTime) - time()
+            sleep_start_time = time() - startTime
             if sleepTime > 0:
                 sleep(sleepTime)
             elif sleepTime < 0:
                 self.FRAMEBUFFER.getNextFrame(universe)
-            logger.debug("Frame sent in {} sec".format(time() - startTime))
+            sleep_end_time = time() - startTime
+
+            loopTime = time() - startTime
+            if loopTime > 0.5:
+                logger.debug("Frame sent in {} sec".format(loopTime))
+                logger.debug("Timings: Loop Start: {}, Got Lock: {}, Start Frame: {}, Got Frame: {}, Sent Frame: {}, Released Lock: {}, Started Sleeping: {}, Ended Sleeping: {}".format(loop_start_time, lock_gotten_time,
+                                frame_start_time, got_frame_time, frame_send_time, lock_release_time, sleep_start_time,
+                                sleep_end_time))
             startTime = time()
 
     def requestClose(self):

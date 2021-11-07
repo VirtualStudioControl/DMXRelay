@@ -45,12 +45,15 @@ class TCPClient(Thread):
         self.sock.connect((self.address, self.port))
         try:
             while self.running:
-                length = self.sock.recv(4)  # 16 kb buffer
-                if len(length) < 4:
-                    continue
-                data = self.sock.recv(getInt(length, start=0))
-                self.logger.debug("Message Recieved: {:08X} {}".format(getInt(length, start=0), str(data)))
-                self.onMessageRecv(data)
+                try:
+                    length = self.sock.recv(4)  # 16 kb buffer
+                    if len(length) < 4:
+                        continue
+                    data = self.sock.recv(getInt(length, start=0))
+                    self.logger.debug("Message Recieved: {:08X} {}".format(getInt(length, start=0), str(data)))
+                    self.onMessageRecv(data)
+                except:
+                    pass
 
         except ConnectionAbortedError:
             pass # Socket closed by another thread

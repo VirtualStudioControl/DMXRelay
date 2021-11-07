@@ -1,4 +1,4 @@
-from typing import Dict, Union, Optional
+from typing import Dict, Union, Optional, List
 
 from .interface.abstract.IDMXDevice import IDMXDevice
 from .interface.dmxusb512promk2.DMX512ProMKII import DMX512ProMKII
@@ -10,7 +10,7 @@ from ..sink.logging import logengine
 
 logger = logengine.getLogger()
 
-INTERFACES = {
+INTERFACES: Dict[str, type] = {
     "Enttec Open DMX USB": OpenDMXUSB,
     "Eurolite USB DMX 512 Pro MK2": DMX512ProMKII
 }
@@ -18,7 +18,7 @@ INTERFACES = {
 SENDER: Optional[DMXSender] = None
 
 
-def getSupportedInterfaces():
+def getSupportedInterfaces() -> List[str]:
     return list(INTERFACES.keys())
 
 

@@ -27,8 +27,8 @@ def createControl(controlBytes: bytes):
     return _buildMessage(CLIENT_MESSAGE_TYPE_CONTROL, controlBytes)
 
 
-def createGet(messageID: int, valueID: int):
-    return createGetSet(messageID, valueID)
+def createGet(messageID: int, valueID: int, callback: Callable[[Any, bytes], None] = None):
+    return createGetSet(messageID, valueID, callback=callback)
 
 
 def createSet(messageID: int, valueID: int, payload: bytes,
