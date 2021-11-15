@@ -18,12 +18,14 @@ class OpenDMXUSB(IDMXDevice):
         self.PARITY = PARITY_NONE
         self.STOPBITS = STOPBITS_TWO
 
-    def initDevice(self, port):
+    def initDevice(self, port, **kwargs):
         self.PORT = port
 
         self.serialConnection = Serial(port=self.PORT, stopbits=self.STOPBITS,
                                        parity=self.PARITY, baudrate=self.BAUDRATE)
         self.serialConnection.setRTS(0)
+        self.serialConnection.setDTR(0)
+
         self.serialConnection.write_timeout = 0.3
         self.serialConnection.set_input_flow_control(False)
         self.serialConnection.set_output_flow_control(False)

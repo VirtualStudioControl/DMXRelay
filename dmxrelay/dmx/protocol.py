@@ -13,7 +13,7 @@ CLIENT_MESSAGE_TYPE_DMX = 0x04
 GET_INTERFACE_NAMES = 0x00000000
 GET_INTERFACE_CONFIGURATION = 0x00000001
 GET_AVAILABLE_PORTS = 0x00000002
-
+GET_CURRENT_DMX_FRAME = 0x00000003
 
 #region Message Handlers
 
@@ -47,6 +47,7 @@ def setInterfaceConfiguration(sessionHandler: TCPSessionHandler, value: bytes) -
     config.setValue(config.CONFIG_KEY_DMX_INTERFACES, content)
     dmx_manager.rebuildDMXUniverse()
 
+
 def getSerialPorts(sessionHandler: TCPSessionHandler) -> bytes:
     ports = list_ports.comports(True)
     result = bytearray()
@@ -57,6 +58,10 @@ def getSerialPorts(sessionHandler: TCPSessionHandler) -> bytes:
 
     return result
 
+
+def getCurrentDMXFrames(sessionHandler: TCPSessionHandler) -> bytes:
+    return dmx_manager.getCurrentFrameData()
+
 #endregion
 
 
@@ -66,4 +71,5 @@ def setup():
     setDataGetter(GET_INTERFACE_NAMES, getInterfaceNames)
     setDataGetterSetter(GET_INTERFACE_CONFIGURATION, getInterfaceConfiguration, setInterfaceConfiguration)
     setDataGetter(GET_AVAILABLE_PORTS, getSerialPorts)
+    setDataGetter(GET_CURRENT_DMX_FRAME, getCurrentDMXFrames)
 

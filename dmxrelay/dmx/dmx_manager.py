@@ -3,6 +3,7 @@ from typing import Dict, Union, Optional, List
 from .interface.abstract.IDMXDevice import IDMXDevice
 from .interface.dmxusb512promk2.DMX512ProMKII import DMX512ProMKII
 from .interface.opendmxusb.OpenDMXUSB import OpenDMXUSB
+from .interface.udmx.UDMX import USB_AVAILABLE
 from .sender.dmx_buffer import DMXBuffer
 from .sender.dmxsender import DMXSender
 from ..sink.config import config
@@ -15,6 +16,10 @@ INTERFACES: Dict[str, type] = {
     "Eurolite USB DMX 512 Pro MK2": DMX512ProMKII
 }
 
+if USB_AVAILABLE:
+    from .interface.udmx.UDMX import UDMXDevice
+    INTERFACES["UDMX"] = UDMXDevice
+
 SENDER: Optional[DMXSender] = None
 
 
@@ -26,6 +31,10 @@ def init():
     global SENDER
     SENDER = DMXSender(INTERFACES)
     SENDER.start()
+
+
+def getCurrentFrameData():
+    return SENDER.getCurrentFrameData()
 
 
 def rebuildDMXUniverse():

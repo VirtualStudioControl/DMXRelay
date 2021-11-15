@@ -9,7 +9,7 @@ class IDMXDevice:
     def manufacturer(self) -> str:
         pass
 
-    def initDevice(self, port):
+    def initDevice(self, port, **kwargs):
         pass
 
     def sendDMXFrame(self, data: Union[list, bytearray, bytes]):

@@ -19,7 +19,7 @@ class DMXSender(Thread):
         self.DMX_UNIVERSES: Dict[int, IDMXDevice] = {}
         self.FRAMEBUFFER = DMXBuffer()
 
-        self.frameTime = 1/120.0
+        self.frameTime = 1/20.0
 
         self.universeLock = Lock()
 
@@ -32,9 +32,15 @@ class DMXSender(Thread):
             interface_configurations = config.getValueOrDefault(config.CONFIG_KEY_DMX_INTERFACES, [])
 
             for device in interface_configurations:
-                dev = self.INTERFACES[device[config.CONFIG_KEY_DMX_INTERFACE_TYPE]]()
-                dev.initDevice(device[config.CONFIG_KEY_DMX_INTERFACE_PORT])
-                self.DMX_UNIVERSES[device[config.CONFIG_KEY_DMX_INTERFACE_UNIVERSE]] = dev
+                try:
+                    dev = self.INTERFACES[device[config.CONFIG_KEY_DMX_INTERFACE_TYPE]]()
+                    dev.initDevice(**device)
+                    self.DMX_UNIVERSES[device[config.CONFIG_KEY_DMX_INTERFACE_UNIVERSE]] = dev
+                except:
+                    logger.warning("Found invalid configuration: {}".format(device))
+
+    def getCurrentFrameData(self):
+        return self.FRAMEBUFFER.getCurrentFrameData()
 
     def run(self) -> None:
         startTime = time()
@@ -46,7 +52,11 @@ class DMXSender(Thread):
                     frame_start_time = time() - startTime
                     frame = self.FRAMEBUFFER.getNextFrame(universe)
                     got_frame_time = time() - startTime
-                    self.DMX_UNIVERSES[universe].sendDMXFrame(frame)
+                    try:
+                        self.DMX_UNIVERSES[universe].sendDMXFrame(frame)
+                    except Exception as ex:
+                        logger.warning("Failed to send DMX Frame")
+                        logger.exception(ex)
                     frame_send_time = time() - startTime
                 lock_release_time = time() - startTime
             sleepTime = (startTime + self.frameTime) - time()

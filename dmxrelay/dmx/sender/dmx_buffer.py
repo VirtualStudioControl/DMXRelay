@@ -2,6 +2,9 @@ from typing import List, Union, Dict
 
 from threading import Lock
 
+from dmxrelay.sink.tools.bytetools import putInt
+
+
 class DMXBuffer():
 
     def __init__(self, defaultFrame=None):
@@ -19,6 +22,18 @@ class DMXBuffer():
             if len(self.buffers[universe]) > 1:
                 del self.buffers[universe][0]
             return result
+
+    def getCurrentFrameData(self) -> bytes:
+        content = bytearray()
+        putInt(content, len(self.buffers))
+
+        with self.frameLock:
+            for universe in self.buffers:
+                putInt(content, universe)
+                putInt(content, len(self.buffers[universe][0]))
+                content += bytearray(self.buffers[universe][0])
+
+        return content
 
     def appendFrame(self, universe, frame):
         with self.frameLock:

@@ -15,7 +15,7 @@ class DMX512ProMKII(IDMXDevice):
         self.PARITY = PARITY_NONE
         self.STOPBITS = STOPBITS_ONE
 
-    def initDevice(self, port):
+    def initDevice(self, port, **kwargs):
         self.PORT = port
 
         self.serialConnection = Serial(port=self.PORT, stopbits=self.STOPBITS,
