@@ -132,13 +132,15 @@ MESSAGE_HANDLERS = {
 
 
 def handleMessage(sessionHandler, message: bytes) -> Optional[bytes]:
-    logger.debug("Got Message: {} from {}:{} [{}]".format(message, sessionHandler.address, sessionHandler.port,
-                                                          sessionHandler.username))
     if not message or len(message) < 1:
         logger.warning("Received Empty message: {}".format(message))
         return None
     if message[0] in MESSAGE_HANDLERS:
-        return MESSAGE_HANDLERS[message[0]](sessionHandler, message)
+        try:
+            return MESSAGE_HANDLERS[message[0]](sessionHandler, message)
+        except Exception as ex:
+            logger.error("Error occured during Message Handling:")
+            logger.exception(ex)
     logger.error("Received Message with Invalid Type: {} from {}".format(message[0], sessionHandler.username))
     return None
 

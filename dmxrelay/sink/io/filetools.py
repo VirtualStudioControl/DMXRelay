@@ -20,7 +20,7 @@ def writeFile(path, content, mode="w"):
             if exc.errno != errno.EEXIST:
                 raise
 
-    f = open(path, mode)
+    f = open(path, mode, encoding='utf8')
     try:
         f.write(content)
     finally:
@@ -34,7 +34,7 @@ def readFileLinesStripped(path):
     :param path: Path to read from
     :return: a list of stripped Lines
     """
-    f = open(path, "r")
+    f = open(path, "r", encoding='utf8')
     lines = []
     try:
         for line in f:
@@ -52,7 +52,7 @@ def readFile(path):
     :param path: Path to read from
     :return: the data of the file
     """
-    f = open(path, "r")
+    f = open(path, "r", encoding='utf8')
     result = ""
     try:
         result = f.read()

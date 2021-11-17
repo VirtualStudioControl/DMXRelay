@@ -4,6 +4,7 @@ from serial.tools import list_ports
 
 from . import dmx_manager
 from ..sink.config import config
+from ..sink.io import filetools
 from ..sink.net.tcp.tcpsessionhandler import TCPSessionHandler
 from ..sink.protocol.serverprotocol import *
 
@@ -14,6 +15,7 @@ GET_INTERFACE_NAMES = 0x00000000
 GET_INTERFACE_CONFIGURATION = 0x00000001
 GET_AVAILABLE_PORTS = 0x00000002
 GET_CURRENT_DMX_FRAME = 0x00000003
+GET_CURRENT_DMX_SCENE = 0x00000003
 
 #region Message Handlers
 
@@ -62,6 +64,10 @@ def getSerialPorts(sessionHandler: TCPSessionHandler) -> bytes:
 def getCurrentDMXFrames(sessionHandler: TCPSessionHandler) -> bytes:
     return dmx_manager.getCurrentFrameData()
 
+
+def getDMXScene(sessionHandler: TCPSessionHandler) -> bytes:
+    return filetools.readFileBinary(config.getValueOrDefault(config.CONFIG_KEY_DMX_SCENE, "dmxscene.json"))
+
 #endregion
 
 
@@ -72,4 +78,4 @@ def setup():
     setDataGetterSetter(GET_INTERFACE_CONFIGURATION, getInterfaceConfiguration, setInterfaceConfiguration)
     setDataGetter(GET_AVAILABLE_PORTS, getSerialPorts)
     setDataGetter(GET_CURRENT_DMX_FRAME, getCurrentDMXFrames)
-
+    setDataGetter(GET_CURRENT_DMX_SCENE, getDMXScene)
