@@ -5,7 +5,9 @@ import sys
 from typing import Dict, Optional
 
 LOG_FORMAT = '[%(asctime)s] [%(levelname)s] %(message)s at %(pathname)s, line %(lineno)d, Function: %(funcName)s'
-LOG_TO_CONSOLE = True
+LOG_TO_CONSOLE = False
+LOG_TO_FILE = True
+LOG_FILE = "dmxrelay.log"
 
 LOG_LEVEL = logging.DEBUG
 
@@ -24,6 +26,12 @@ def getLogger(name=None, level=None, isVerbose=False) -> Logger:
     log.setLevel(log_level)
 
     if not log.hasHandlers():
+        if LOG_TO_FILE:
+            # Writing to log file
+            handler = logging.FileHandler(LOG_FILE)
+            handler.setLevel(log_level)
+            handler.setFormatter(log_format)
+            log.addHandler(handler)
 
         if LOG_TO_CONSOLE:
             # writing to stdout

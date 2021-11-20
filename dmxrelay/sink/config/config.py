@@ -24,6 +24,8 @@ CONFIG_KEY_DMX_INTERFACE_TYPE = "type"
 CONFIG_KEY_DMX_INTERFACE_UNIVERSE = "universe"
 
 CONFIG_KEY_DMX_INTERFACE_AVAIL_TYPES = "interface_types"
+
+CONFIG_KEY_DMX_PERSISTENT_FRAME = "persistent_dmx_frame"
 #endregion
 
 

@@ -94,7 +94,7 @@ def readFileBinary(path):
     :return: the data of the file
     """
     f = open(path, "rb")
-    result = ""
+    result = None
     try:
         result = f.read()
     finally:

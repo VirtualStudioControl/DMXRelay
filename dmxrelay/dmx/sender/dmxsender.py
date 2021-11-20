@@ -42,6 +42,9 @@ class DMXSender(Thread):
     def getCurrentFrameData(self):
         return self.FRAMEBUFFER.getCurrentFrameData()
 
+    def storeExitFrame(self):
+        self.FRAMEBUFFER.storeExitFrame()
+
     def run(self) -> None:
         startTime = time()
         while not self.shouldFinish:

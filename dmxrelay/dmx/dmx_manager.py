@@ -42,6 +42,9 @@ def rebuildDMXUniverse():
         init()
     SENDER.rebuildUniverse()
 
+def storeExitFrame():
+    if SENDER is not None:
+        SENDER.storeExitFrame()
 
 def sendDMXFrame(appendFrame: bool, universe: int, frameData: Union[list, bytearray, bytes]):
     if appendFrame:
