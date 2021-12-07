@@ -66,9 +66,11 @@ def __handleMessageAuthenticate(sessionHandler, message: bytes) -> Optional[byte
         user = sessionHandler.authManager.getUserByName(username)
         referenceString = generateAuthBytesFromSaltedPassword(username, user.passwd_hash, sessionHandler.challenge)
         if referenceString == auth_string:
+
             sessionHandler.authenticated = True
             logger.info("User Authenticated: {}".format(username))
             return createAuthenticated(AUTH_SUCCESS)
+        logger.info("SALT: {}, CHALLENGE: {}, AUHTBYTES: {}".format(user.salt, sessionHandler.challenge, referenceString))
     logger.info("User Authentification Failed: {}".format(username))
 
     return createAuthenticated(AUTH_FAIL)

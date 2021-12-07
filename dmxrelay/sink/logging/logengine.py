@@ -5,7 +5,7 @@ import sys
 from typing import Dict, Optional
 
 LOG_FORMAT = '[%(asctime)s] [%(levelname)s] %(message)s at %(pathname)s, line %(lineno)d, Function: %(funcName)s'
-LOG_TO_CONSOLE = False
+LOG_TO_CONSOLE = True
 LOG_TO_FILE = True
 LOG_FILE = "dmxrelay.log"
 

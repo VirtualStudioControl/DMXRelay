@@ -1,22 +1,32 @@
 from typing import List
+import base64
 
 from . import auth_utils
 
 
 class User:
 
-    def __init__(self, username, salt=None, passwd_hash=None):
+    def __init__(self, username, salt=None, passwd_hash=None, permissions=None):
+        if permissions is None:
+            permissions = []
+
         self.username: str = username
-        self.passwd_hash: bytes = passwd_hash
-        self.salt: bytes = salt
+        self.passwd_hash: bytes = self.ensureDecoding(passwd_hash)
+        self.salt: bytes = self.ensureDecoding(salt)
 
         self.permissions: List[int] = []
+
+    def ensureDecoding(self, val):
+        if type(val) == str:
+            print("DECODING B64:", val)
+            return base64.b64decode(val)
+        return val
 
     def toDict(self):
         return {
             'username': self.username,
-            'password_hash': self.passwd_hash,
-            'salt': self.salt,
+            'passwd_hash': str(base64.b64encode(self.passwd_hash)),
+            'salt': str(base64.b64encode(self.salt)),
             'permissions': self.permissions
         }
 

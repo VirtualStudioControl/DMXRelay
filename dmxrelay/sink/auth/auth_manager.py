@@ -43,4 +43,7 @@ class AuthManager:
 
     def loadDB(self):
         values = readJSON(getValueOrDefault(CONFIG_KEY_USER_DB, "users.json"))
-        # TODO: Load UserDB
+        users = values['users']
+
+        for user in users:
+            self.addUser(User(**user))
