@@ -29,7 +29,10 @@ class TCPSessionHandler(Thread):
             self.shouldClose = False
             while not self.shouldClose:
                 length = self.getMessageLength()
-                data = self.connection.recv(length)
+                data = bytearray()
+                while len(data) < length:
+                    data += self.connection.recv(length - len(data))
+                #data = self.connection.recv(length)
                 self.onMessageRecv(data)
 
         except ConnectionResetError:
@@ -42,11 +45,10 @@ class TCPSessionHandler(Thread):
         self.shouldClose = True
 
     def getMessageLength(self) -> int:
-        while True:
-            length = self.connection.recv(4)  # 16 kb buffer
-            if len(length) < 4:
-                continue
-            return getInt(length, start=0)
+        length = self.connection.recv(4)
+        while len(length) < 4:
+            length += self.connection.recv(4 - len(length))  # 16 kb buffer
+        return getInt(length, start=0)
 
     def onMessageRecv(self, data):
         response = handleMessage(self, data)
@@ -54,6 +56,7 @@ class TCPSessionHandler(Thread):
             self.sendMessage(response)
 
     def sendMessage(self, message: bytes):
+        self.logger.info("Sending Message: {}".format(message))
         if self.connection is not None:
             self.sendLock.acquire()
             try:
