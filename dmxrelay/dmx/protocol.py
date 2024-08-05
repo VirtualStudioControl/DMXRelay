@@ -1,6 +1,12 @@
 import json
 from typing import List
-from serial.tools import list_ports
+SERIAL_AVAILABLE = False
+try:
+    from serial.tools import list_ports
+    SERIAL_AVAILABLE = True
+except:
+    SERIAL_AVAILABLE = False
+
 
 from . import dmx_manager
 from ..sink.config import config
@@ -51,15 +57,16 @@ def setInterfaceConfiguration(sessionHandler: TCPSessionHandler, value: bytes) -
 
 
 def getSerialPorts(sessionHandler: TCPSessionHandler) -> bytes:
-    ports = list_ports.comports(True)
-    result = bytearray()
-    for info in ports:
-        if info.manufacturer is not None or info.product is not None:
-            result += info.device.encode("utf-8")
-            result.append(0x00)
+    if SERIAL_AVAILABLE:
+        ports = list_ports.comports(True)
+        result = bytearray()
+        for info in ports:
+            if info.manufacturer is not None or info.product is not None:
+                result += info.device.encode("utf-8")
+                result.append(0x00)
 
-    return result
-
+        return result
+    return bytearray([0x00,])
 
 def getCurrentDMXFrames(sessionHandler: TCPSessionHandler) -> bytes:
     return dmx_manager.getCurrentFrameData()

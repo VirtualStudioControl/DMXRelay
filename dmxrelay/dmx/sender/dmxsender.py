@@ -36,8 +36,9 @@ class DMXSender(Thread):
                     dev = self.INTERFACES[device[config.CONFIG_KEY_DMX_INTERFACE_TYPE]]()
                     dev.initDevice(**device)
                     self.DMX_UNIVERSES[device[config.CONFIG_KEY_DMX_INTERFACE_UNIVERSE]] = dev
-                except:
+                except Exception as ex:
                     logger.warning("Found invalid configuration: {}".format(device))
+                    logger.exception(ex)
 
     def getCurrentFrameData(self):
         return self.FRAMEBUFFER.getCurrentFrameData()
