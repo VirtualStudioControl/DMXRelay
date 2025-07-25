@@ -27,6 +27,7 @@ if SERIAL_AVAILABLE:
             self.STOPBITS = STOPBITS_TWO
 
         def initDevice(self, port, **kwargs):
+            super().initDevice(**kwargs)
             self.PORT = port
 
             self.serialConnection = Serial(port=self.PORT, stopbits=self.STOPBITS,
@@ -38,7 +39,7 @@ if SERIAL_AVAILABLE:
             self.serialConnection.set_input_flow_control(False)
             self.serialConnection.set_output_flow_control(False)
 
-        def sendDMXFrame(self, data: Union[list, bytearray, bytes]):
+        def sendDMXFrame(self, universe: int, data: Union[list, bytearray, bytes]):
             if self.serialConnection is not None:
                 source = bytearray([0])
                 source += bytearray(data)

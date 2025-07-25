@@ -12,6 +12,10 @@ CONFIG_KEY_REQUIRE_AUTH = "requireAuth"
 CONFIG_KEY_USER_DB = "user_db"
 CONFIG_KEY_DMX_SCENE = "dmx_scene"
 
+CONFIG_KEY_SIMULATION_ENABLE = ["simulation", "enable"]
+CONFIG_KEY_SIMULATION_LISTEN_ADDRESS = ["simulation", "listen_address"]
+CONFIG_KEY_SIMULATION_PORT = ["simulation", "port"]
+
 CONFIG_KEY_DMX_INTERFACES = "dmx_interfaces"
 CONFIG_KEY_DMX_INTERFACE_PORT = "port"
 

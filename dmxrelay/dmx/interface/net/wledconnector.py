@@ -1,16 +1,25 @@
+import socket as so
+from enum import Enum
+from socket import socket
 from typing import Union
 
 from dmxrelay.dmx.interface.abstract.IDMXDevice import IDMXDevice
 
-import socket as so
-from socket import socket
+class WLEDProtocol(Enum):
+    WARLS = 1
+    DRGB = 2
+    DRGBW = 3
+    DNRGB = 4
+    WLED_NOTIFIER = 0
 
-class UDPConnector(IDMXDevice):
+class WLEDConnector(IDMXDevice):
 
     def __init__(self):
         self.PORT = ""
         self.IP_ADDRESS = "127.0.0.1"
         self.IP_PORT = 4400
+
+        self.protocol_type = WLEDProtocol.DRGBW
 
         self.socketBufferSize = 512 * 2
 
@@ -40,6 +49,9 @@ class UDPConnector(IDMXDevice):
 
         self.socket.bind(('', 0))
         self.__isRunning = True
+
+    def universeCount(self) -> int:
+        return 2
 
     def sendDMXFrame(self, universe: int, data: Union[list, bytearray, bytes]):
         try:

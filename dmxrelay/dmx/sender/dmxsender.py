@@ -11,8 +11,9 @@ logger = logengine.getLogger()
 
 class DMXSender(Thread):
 
-    def __init__(self, interfaces):
+    def __init__(self, interfaces, simulation = None):
         super().__init__()
+        self.SIMULATION = simulation
         self.shouldFinish = False
 
         self.INTERFACES = interfaces
@@ -25,7 +26,7 @@ class DMXSender(Thread):
 
     def rebuildUniverse(self):
         with self.universeLock:
-            logger.debug("Rebuilding Universe")
+            logger.debug("Reloading Configuration")
             for universe in self.DMX_UNIVERSES:
                 self.DMX_UNIVERSES[universe].closeDevice()
             self.DMX_UNIVERSES.clear()
@@ -46,6 +47,8 @@ class DMXSender(Thread):
     def storeExitFrame(self):
         self.FRAMEBUFFER.storeExitFrame()
 
+    #TODO: Loop over interfaces instead of universes
+    # allowing for multi-universe interfaces
     def run(self) -> None:
         startTime = time()
         while not self.shouldFinish:
@@ -57,7 +60,9 @@ class DMXSender(Thread):
                     frame = self.FRAMEBUFFER.getNextFrame(universe)
                     got_frame_time = time() - startTime
                     try:
-                        self.DMX_UNIVERSES[universe].sendDMXFrame(frame)
+                        self.DMX_UNIVERSES[universe].sendDMXFrame(universe, frame)
+                        if self.SIMULATION is not None:
+                            self.SIMULATION.sendDMXFrame(universe, frame)
                     except Exception as ex:
                         logger.warning("Failed to send DMX Frame")
                         logger.exception(ex)

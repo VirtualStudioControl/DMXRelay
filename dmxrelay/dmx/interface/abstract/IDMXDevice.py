@@ -12,7 +12,10 @@ class IDMXDevice:
     def initDevice(self, port, **kwargs):
         pass
 
-    def sendDMXFrame(self, data: Union[list, bytearray, bytes]):
+    def universeCount(self) -> int:
+        return 1
+
+    def sendDMXFrame(self, universe: int, data: Union[list, bytearray, bytes]):
         pass
 
     def closeDevice(self):

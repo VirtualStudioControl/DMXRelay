@@ -36,6 +36,7 @@ if USB_AVAILABLE:
 
         def initDevice(self, usb_vendor_id: int = 0x16c0, usb_product_id: int = 0x5dc,
                        usb_bus: int = None, usb_address: int = None, **kwargs) -> bool:
+            super().initDevice(**kwargs)
             """
             Open the first device that matches the search criteria. Th default parameters
             are set up for the likely most common case of a single uDMX interface.
@@ -139,7 +140,7 @@ if USB_AVAILABLE:
                                            channel=channel, data_or_length=ba)
             return n
 
-        def sendDMXFrame(self, data: Union[list, bytearray, bytes]):
+        def sendDMXFrame(self, universe: int, data: Union[list, bytearray, bytes]):
             self.send_multi_value(1, data)
 
         def closeDevice(self):
