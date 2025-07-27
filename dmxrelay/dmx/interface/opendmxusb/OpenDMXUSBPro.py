@@ -18,6 +18,8 @@ if SERIAL_AVAILABLE:
     class OpenDMXUSBPro(IDMXDevice):
 
         def __init__(self):
+            super().__init__()
+
             self.PORT = ""
             self.serialConnection: Optional[Serial] = None
 

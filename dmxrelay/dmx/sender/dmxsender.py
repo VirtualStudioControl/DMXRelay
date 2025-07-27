@@ -1,6 +1,6 @@
 from threading import Thread, Lock
 from time import sleep, time
-from typing import Dict
+from typing import Dict, List
 
 from dmxrelay.dmx.interface.abstract.IDMXDevice import IDMXDevice
 from dmxrelay.dmx.sender.dmx_buffer import DMXBuffer
@@ -17,7 +17,8 @@ class DMXSender(Thread):
         self.shouldFinish = False
 
         self.INTERFACES = interfaces
-        self.DMX_UNIVERSES: Dict[int, IDMXDevice] = {}
+        #self.DMX_UNIVERSES: Dict[int, IDMXDevice] = {}
+        self.DMX_DEVICES: List[IDMXDevice] = []
         self.FRAMEBUFFER = DMXBuffer()
 
         self.frameTime = 1/20.0
@@ -27,16 +28,16 @@ class DMXSender(Thread):
     def rebuildUniverse(self):
         with self.universeLock:
             logger.debug("Reloading Configuration")
-            for universe in self.DMX_UNIVERSES:
-                self.DMX_UNIVERSES[universe].closeDevice()
-            self.DMX_UNIVERSES.clear()
+            for device in self.DMX_DEVICES:
+                device.closeDevice()
+            self.DMX_DEVICES.clear()
             interface_configurations = config.getValueOrDefault(config.CONFIG_KEY_DMX_INTERFACES, [])
 
             for device in interface_configurations:
                 try:
                     dev = self.INTERFACES[device[config.CONFIG_KEY_DMX_INTERFACE_TYPE]]()
                     dev.initDevice(**device)
-                    self.DMX_UNIVERSES[device[config.CONFIG_KEY_DMX_INTERFACE_UNIVERSE]] = dev
+                    self.DMX_DEVICES.append(dev)
                 except Exception as ex:
                     logger.warning("Found invalid configuration: {}".format(device))
                     logger.exception(ex)
@@ -55,17 +56,20 @@ class DMXSender(Thread):
             loop_start_time = time() - startTime
             with self.universeLock:
                 lock_gotten_time = time() - startTime
-                for universe in self.DMX_UNIVERSES:
+                for device in self.DMX_DEVICES:
                     frame_start_time = time() - startTime
-                    frame = self.FRAMEBUFFER.getNextFrame(universe)
-                    got_frame_time = time() - startTime
-                    try:
-                        self.DMX_UNIVERSES[universe].sendDMXFrame(universe, frame)
-                        if self.SIMULATION is not None:
-                            self.SIMULATION.sendDMXFrame(universe, frame)
-                    except Exception as ex:
-                        logger.warning("Failed to send DMX Frame")
-                        logger.exception(ex)
+                    for universe_offset in range(device.universeCount()):
+                        universe = device.base_universe + universe_offset
+                        frame = self.FRAMEBUFFER.getNextFrame(universe)
+                        got_frame_time = time() - startTime
+                        try:
+                            device.sendDMXFrame(universe, frame)
+                            if self.SIMULATION is not None:
+                                self.SIMULATION.sendDMXFrame(universe, frame)
+                        except Exception as ex:
+                            logger.warning("Failed to send DMX Frame")
+                            logger.exception(ex)
+                    device.flushDMXData()
                     frame_send_time = time() - startTime
                 lock_release_time = time() - startTime
             sleepTime = (startTime + self.frameTime) - time()

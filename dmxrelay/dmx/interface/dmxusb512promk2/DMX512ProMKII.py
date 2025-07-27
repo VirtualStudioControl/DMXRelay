@@ -14,6 +14,7 @@ if SERIAL_AVAILABLE:
     class DMX512ProMKII(IDMXDevice):
 
         def __init__(self):
+            super().__init__()
             self.PORT = ""
             self.HEADDER: List[int]= [0x7e, 6, 1, 2, 0]
             self.FOOTER: List[int]= [0xe7]

@@ -12,15 +12,29 @@ class WLEDProtocol(Enum):
     DNRGB = 4
     WLED_NOTIFIER = 0
 
+CHANNELS_PER_LED = {
+    WLEDProtocol.WARLS: 0,
+    WLEDProtocol.DRGB: 3,
+    WLEDProtocol.DRGBW: 4,
+    WLEDProtocol.DNRGB: 3,
+    WLEDProtocol.WLED_NOTIFIER: 0,
+}
+
 class WLEDConnector(IDMXDevice):
 
     def __init__(self):
+        super().__init__()
+
         self.PORT = ""
         self.IP_ADDRESS = "127.0.0.1"
         self.IP_PORT = 4400
 
+        # TODO: Make Configurable
         self.protocol_type = WLEDProtocol.DRGBW
+        self.protocol_timeout = 1
+        self.LED_COUNT = 134
 
+        self.frame_buffer = bytearray(self.LED_COUNT * CHANNELS_PER_LED[self.protocol_type] + 2)
         self.socketBufferSize = 512 * 2
 
         self.socket: socket = None
@@ -51,23 +65,29 @@ class WLEDConnector(IDMXDevice):
         self.__isRunning = True
 
     def universeCount(self) -> int:
-        return 2
+        return 1 if self.LED_COUNT * CHANNELS_PER_LED[self.protocol_type] < 512 else 2
 
     def sendDMXFrame(self, universe: int, data: Union[list, bytearray, bytes]):
+        if isinstance(data, list):
+            source = bytearray()
+
+            for i in data:
+                val = i
+                if val > 0xff:
+                    val = 0xff
+                elif val < 0:
+                    val = 0
+                source.append(val)
+            data = source
+        offset = (universe - self.base_universe) * 512
+        length = min(512, (self.LED_COUNT * CHANNELS_PER_LED[self.protocol_type]) - offset)
+        self.frame_buffer[2 + offset: 2 + offset + length] = data[0:length]
+
+    def flushDMXData(self):
         try:
-            if isinstance(data, list):
-                source = bytearray()
-
-                for i in data:
-                    val = i
-                    if val > 0xff:
-                        val = 0xff
-                    elif val < 0:
-                        val = 0
-                    source.append(val)
-                data = source
-
-            self.socket.sendto(data, (self.IP_ADDRESS, self.IP_PORT))
+            self.frame_buffer[0] = (self.protocol_type.value & 0xff)
+            self.frame_buffer[1] = (self.protocol_timeout & 0xff)
+            self.socket.sendto(self.frame_buffer, (self.IP_ADDRESS, self.IP_PORT))
         except Exception as ex:
             print("Exception occured while sending UDP packet: {}".format(ex))
 

@@ -32,6 +32,8 @@ if USB_AVAILABLE:
     class UDMXDevice(IDMXDevice):
 
         def __init__(self):
+            super().__init__()
+
             self._dev = None
 
         def initDevice(self, usb_vendor_id: int = 0x16c0, usb_product_id: int = 0x5dc,

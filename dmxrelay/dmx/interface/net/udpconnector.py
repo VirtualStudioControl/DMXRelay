@@ -8,6 +8,8 @@ from socket import socket
 class UDPConnector(IDMXDevice):
 
     def __init__(self):
+        super().__init__()
+
         self.PORT = ""
         self.IP_ADDRESS = "127.0.0.1"
         self.IP_PORT = 4400
