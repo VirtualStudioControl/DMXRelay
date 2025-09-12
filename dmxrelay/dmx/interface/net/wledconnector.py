@@ -4,6 +4,9 @@ from socket import socket
 from typing import Union
 
 from dmxrelay.dmx.interface.abstract.IDMXDevice import IDMXDevice
+from dmxrelay.sink.logging.logengine import getLogger
+
+logger = getLogger("WLED")
 
 class WLEDProtocol(Enum):
     WARLS = 1
@@ -35,7 +38,7 @@ class WLEDConnector(IDMXDevice):
         self.LED_COUNT = 134
 
         self.frame_buffer = bytearray(self.LED_COUNT * CHANNELS_PER_LED[self.protocol_type] + 2)
-        self.socketBufferSize = 512 * 2
+        self.socketBufferSize = len(self.frame_buffer) * 5
 
         self.socket: socket = None
         self.__isRunning = False

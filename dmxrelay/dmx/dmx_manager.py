@@ -25,6 +25,7 @@ if SERIAL_AVAILABLE:
     INTERFACES["Enttec Open DMX USB Pro"] = OpenDMXUSBPro
     INTERFACES["Eurolite USB DMX 512 Pro"] = DMX512ProMKII
     INTERFACES["Eurolite USB DMX 512 Pro MK2"] = DMX512ProMKII
+    INTERFACES["DMX 485"] = DMX485
 
 if USB_AVAILABLE:
     from .interface.udmx.UDMX import UDMXDevice
