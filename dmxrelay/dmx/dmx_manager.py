@@ -20,6 +20,7 @@ if SERIAL_AVAILABLE:
     from .interface.opendmxusb.OpenDMXUSB import OpenDMXUSB
     from .interface.opendmxusb.OpenDMXUSBPro import OpenDMXUSBPro
     from .interface.dmxusb512promk2.DMX512ProMKII import DMX512ProMKII
+    from .interface.generic.dmx485 import DMX485
 
     INTERFACES["Enttec Open DMX USB"] = OpenDMXUSB
     INTERFACES["Enttec Open DMX USB Pro"] = OpenDMXUSBPro
