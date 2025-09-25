@@ -1,6 +1,7 @@
 from typing import Dict, Union, Optional, List
 
 from .interface.dmxusb512promk2.DMX512ProMKII import SERIAL_AVAILABLE
+from .interface.net.dmxrelayconnector import DMXRelayConnector
 from .interface.net.udpconnector import UDPConnector
 from .interface.net.wledconnector import WLEDConnector
 
@@ -34,6 +35,7 @@ if USB_AVAILABLE:
 
 INTERFACES["UDP"] = UDPConnector
 INTERFACES["WLED"] = WLEDConnector
+INTERFACES["DMXRELAY"] = DMXRelayConnector
 
 SENDER: Optional[DMXSender] = None
 

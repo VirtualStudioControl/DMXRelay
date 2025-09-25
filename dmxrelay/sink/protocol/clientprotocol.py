@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Any
+from typing import Optional, Callable, Any, Iterable
 
 from .constants import *
 from .constants import _buildMessage
@@ -54,6 +54,17 @@ def createGetSet(messageID: int, valueID: int, payload: Optional[bytes] = None,
         RESPONSE_CALLBACKS[messageID] = callback
 
     return _buildMessage(CLIENT_MESSAGE_TYPE_GETSET, content)
+
+
+def createDMXMessage(shouldAppend: bool, universe: int, frame: Iterable):
+    data = bytearray()
+    if shouldAppend:
+        data.append(DMX_APPEND)
+    else:
+        data.append(DMX_SET)
+    putInt(data, universe)
+    data += bytearray(frame)
+    return _buildMessage(CLIENT_MESSAGE_TYPE_DMX, data)
 
 
 def createBroadcast(message: bytes):

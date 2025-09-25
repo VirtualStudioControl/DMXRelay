@@ -23,6 +23,14 @@ CHANNELS_PER_LED = {
     WLEDProtocol.WLED_NOTIFIER: 0,
 }
 
+PROTOCOLS = {
+    "WARLS": WLEDProtocol.WARLS,
+    "DRGB": WLEDProtocol.DRGB,
+    "DRGBW": WLEDProtocol.DRGBW,
+    "DNRGB": WLEDProtocol.DNRGB,
+    "WLED_NOTIFIER": WLEDProtocol.WLED_NOTIFIER,
+}
+
 class WLEDConnector(IDMXDevice):
 
     def __init__(self):
@@ -50,6 +58,13 @@ class WLEDConnector(IDMXDevice):
 
         self.IP_ADDRESS = kwargs['ip_address']
         self.IP_PORT = kwargs['ip_port']
+
+        self.protocol_type = PROTOCOLS[kwargs['wled_protocol']]
+        self.protocol_timeout = kwargs['wled_timeout']
+        self.LED_COUNT = kwargs['wled_pixel_count']
+
+        self.frame_buffer = bytearray(self.LED_COUNT * CHANNELS_PER_LED[self.protocol_type] + 2)
+        self.socketBufferSize = len(self.frame_buffer) * 5
 
         self.socket = socket(so.AF_INET, so.SOCK_DGRAM)
 
