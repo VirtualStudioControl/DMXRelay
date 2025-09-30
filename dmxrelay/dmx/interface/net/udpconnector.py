@@ -23,7 +23,7 @@ class UDPConnector(IDMXDevice):
     def initDevice(self, port, **kwargs):
         super().initDevice(**kwargs)
         self.PORT = port
-
+        #TODO: Resolve address just to ensure that we have an IP address here, instead of a potential host name
         self.IP_ADDRESS = kwargs['ip_address']
         self.IP_PORT = kwargs['ip_port']
 

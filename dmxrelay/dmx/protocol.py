@@ -27,7 +27,7 @@ GET_CURRENT_DMX_SCENE = 0x00000004
 
 def __handleMessageDMX(sessionHandler: TCPSessionHandler, message: bytes) -> Optional[bytes]:
     if sessionHandler.authenticated:
-        dmx_manager.sendDMXFrame(message[1]&0x01 == 0x01, getInt(message, 2), message[6:])
+        dmx_manager.sendDMXFrame(message[1]&0x01 == 0x01, getInt(message, 2), bytearray(message[6:]))
     return None
 
 #endregion

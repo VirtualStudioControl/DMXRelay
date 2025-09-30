@@ -11,9 +11,9 @@ class DMXBuffer():
 
     def __init__(self, defaultFrame=None):
         if defaultFrame is None:
-            defaultFrame = [0]*512
+            defaultFrame = bytearray([0]*512)
         self.defaultFrame = defaultFrame
-        self.buffers: Dict[int, List[Union[bytes, bytearray, List[int]]]] = {}
+        self.buffers: Dict[int, List[bytearray]] = {}
         self.frameLock = Lock()
 
         with self.frameLock:
@@ -45,13 +45,13 @@ class DMXBuffer():
 
         return content
 
-    def appendFrame(self, universe, frame):
+    def appendFrame(self, universe: int, frame: bytearray):
         with self.frameLock:
             if universe not in self.buffers:
                 self.buffers[universe] = []
             self.buffers[universe].append(frame)
 
-    def setFrame(self, universe, frame):
+    def setFrame(self, universe: int, frame: bytearray):
         with self.frameLock:
             self.buffers[universe] = [frame]
 
