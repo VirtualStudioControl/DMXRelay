@@ -51,8 +51,6 @@ class DMXSender(Thread):
     def storeExitFrame(self):
         self.FRAMEBUFFER.storeExitFrame()
 
-    #TODO: Loop over interfaces instead of universes
-    # allowing for multi-universe interfaces
     def run(self) -> None:
         startTime = time()
         while not self.shouldFinish:
@@ -84,11 +82,13 @@ class DMXSender(Thread):
             sleep_end_time = time() - startTime
 
             loopTime = time() - startTime
+            #logger.debug("Loop Time: {} sec".format(loopTime))
             if loopTime > 0.5:
                 logger.debug("Frame sent in {} sec".format(loopTime))
-                logger.debug("Timings: Loop Start: {}, Got Lock: {}, Start Frame: {}, Got Frame: {}, Sent Frame: {}, Released Lock: {}, Started Sleeping: {}, Ended Sleeping: {}".format(loop_start_time, lock_gotten_time,
-                                frame_start_time, got_frame_time, frame_send_time, lock_release_time, sleep_start_time,
-                                sleep_end_time))
+                logger.debug("Timings: Loop Start: {}, Got Lock: {}, Start Frame: {}, Got Frame: {}, Sent Frame: {}, Released Lock: {}, Started Sleeping: {}, Ended Sleeping: {}".format(
+                    loop_start_time, lock_gotten_time,
+                    frame_start_time, got_frame_time, frame_send_time,
+                    lock_release_time, sleep_start_time, sleep_end_time))
             startTime = time()
 
     def requestClose(self):

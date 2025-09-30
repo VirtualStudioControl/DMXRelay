@@ -70,7 +70,7 @@ def storeExitFrame():
     if SENDER is not None:
         SENDER.storeExitFrame()
 
-def sendDMXFrame(appendFrame: bool, universe: int, frameData: Union[list, bytearray, bytes]):
+def sendDMXFrame(appendFrame: bool, universe: int, frameData: bytearray):
     if appendFrame:
         SENDER.FRAMEBUFFER.appendFrame(universe, frameData)
     else:

@@ -88,7 +88,6 @@ class WLEDConnector(IDMXDevice):
     def sendDMXFrame(self, universe: int, data: Union[list, bytearray, bytes]):
         if isinstance(data, list):
             source = bytearray()
-
             for i in data:
                 val = i
                 if val > 0xff:

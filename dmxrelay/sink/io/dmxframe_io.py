@@ -21,7 +21,7 @@ def writeDMXFrame(path, frameData: List[Tuple[int, Union[bytes, bytearray, List[
     writeFileBinary(path, content)
 
 
-def readDMXFrame(path) -> Optional[List[Tuple[int, Union[bytes, bytearray, List[int]]]]]:
+def readDMXFrame(path) -> Optional[List[Tuple[int, bytearray]]]:
     try:
         content = readFileBinary(path)
     except:
@@ -44,6 +44,6 @@ def readDMXFrame(path) -> Optional[List[Tuple[int, Union[bytes, bytearray, List[
         position += 4
         data = content[position: position+universeLength]
         position += universeLength
-        results.append((universe, data))
+        results.append((universe, bytearray(data)))
 
     return results
